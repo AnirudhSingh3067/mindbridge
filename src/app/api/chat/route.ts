@@ -31,7 +31,7 @@ export async function POST(req: Request) {
         }
 
         const response = await client.chat.completions.create({
-            model: "llama-3.1-70b-versatile",
+            model: "moonshotai/kimi-k2-instruct",
             messages: [
                 { role: "system", content: "You are a calm and supportive mental health assistant." },
                 { role: "user", content: message }
