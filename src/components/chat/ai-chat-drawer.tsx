@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Brain, Send, User, AlertTriangle, Loader2, Sparkles, Heart } from "lucide-react";
-import { detectHighRiskConversation } from "@/ai/flows/ai-high-risk-conversation-detection-flow";
+
 import {
   AlertDialog,
   AlertDialogContent,
@@ -83,36 +83,24 @@ export function AIChatDrawer({ open, onOpenChange }: { open: boolean, onOpenChan
       const aiMsg: Message = { role: "ai", content: data.reply };
       setMessages(prev => [...prev, aiMsg]);
 
-      // Detect risk as a separate step
+      // Log chat history
       try {
-        const riskCheck = await detectHighRiskConversation({
-          chatHistory: [...messages, userMsg, aiMsg].map(m => ({ role: m.role, content: m.content }))
-        });
-
         if (user && db) {
           addDocumentNonBlocking(collection(db, "ai_chat_logs"), {
             userId: user.uid,
             message: textToSend,
             sender: "user",
-            riskScore: riskCheck.riskScore,
-            riskLevel: riskCheck.riskLevel,
             timestamp: serverTimestamp()
           });
           addDocumentNonBlocking(collection(db, "ai_chat_logs"), {
             userId: user.uid,
             message: data.reply,
             sender: "ai",
-            riskScore: riskCheck.riskScore,
-            riskLevel: riskCheck.riskLevel,
             timestamp: serverTimestamp()
           });
         }
-
-        if (riskCheck.riskLevel === "high" || riskCheck.riskLevel === "critical") {
-          setRiskAlert({ riskLevel: riskCheck.riskLevel, suggestion: riskCheck.escalationSuggestion });
-        }
-      } catch (riskError) {
-        console.warn("Risk monitoring temporarily unavailable:", riskError);
+      } catch (logError) {
+        console.warn("Log tracking temporarily unavailable:", logError);
       }
     } catch (error: any) {
       console.error("AI Error:", error);

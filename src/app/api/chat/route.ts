@@ -1,5 +1,10 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import OpenAI from "openai";
 import { NextResponse } from "next/server";
+
+const client = new OpenAI({
+    apiKey: process.env.XAI_API_KEY,
+    baseURL: "https://api.x.ai/v1",
+});
 
 export async function POST(req: Request) {
     try {
@@ -21,23 +26,21 @@ export async function POST(req: Request) {
             });
         }
 
-        const apiKey = process.env.GEMINI_API_KEY;
-        if (!apiKey) {
-            throw new Error("GEMINI_API_KEY is not defined in the environment.");
+        if (!process.env.XAI_API_KEY) {
+            throw new Error("XAI_API_KEY is not defined in the environment.");
         }
 
-        const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({
-            model: "gemini-2.5-flash",
+        const response = await client.chat.completions.create({
+            model: "grok-2-latest",
+            messages: [
+                { role: "system", content: "You are a calm and supportive mental health assistant. Never give medical diagnosis. If user expresses self-harm intent, respond with crisis support guidance." },
+                { role: "user", content: message }
+            ],
         });
 
-        // We prepend the system instruction since legacy gemini-pro does not natively support systemInstruction in the config
-        const prompt = `System Instruction: You are a calm and supportive mental health assistant. Never give medical diagnosis. If user expresses self-harm intent, respond with crisis support guidance.\n\nUser: ${message}`;
-
-        const result = await model.generateContent(prompt);
-        const responseText = result.response.text();
-
-        return NextResponse.json({ reply: responseText });
+        return NextResponse.json({
+            reply: response.choices[0].message?.content || "No response received.",
+        });
     } catch (error: any) {
         console.error("Chat API Error:", error);
         return NextResponse.json(
