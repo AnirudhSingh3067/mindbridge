@@ -1,13 +1,12 @@
 from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
-from openai import AsyncOpenAI
+from groq import AsyncGroq
 from firebase import verify_firebase_token
 from config import settings
 
 router = APIRouter()
-client = AsyncOpenAI(
+client = AsyncGroq(
     api_key=settings.XAI_API_KEY,
-    base_url="https://api.x.ai/v1"
 )
 
 class ChatRequest(BaseModel):
@@ -36,7 +35,7 @@ async def chat_endpoint(request: ChatRequest, token: dict = Depends(verify_fireb
 
     try:
         response = await client.chat.completions.create(
-            model="grok-beta",
+            model="llama-3.3-70b-versatile",
             messages=[
                 {"role": "system", "content": "You are a calm and supportive mental health assistant."},
                 {"role": "user", "content": message}
