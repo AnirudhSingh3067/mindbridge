@@ -35,9 +35,9 @@ async def chat_endpoint(request: ChatRequest):
 
     try:
         print("GROQ KEY LOADED:", bool(settings.GROQ_API_KEY))
-        
+
         response = await client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+            model="llama3-70b-8192",
             messages=[
                 {"role": "system", "content": "You are a calm and supportive mental health assistant."},
                 {"role": "user", "content": message}
