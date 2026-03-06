@@ -69,18 +69,21 @@ export function AIChatDrawer({ open, onOpenChange }: { open: boolean, onOpenChan
     setIsLoading(true);
 
     try {
-      let token = "";
-      if (user) {
-        token = await user.getIdToken();
-      }
 
       const backendUrl = getBackendUrl();
+
+      let headers: any = {
+        "Content-Type": "application/json",
+      };
+
+      if (user) {
+        const token = await user.getIdToken();
+        headers["Authorization"] = `Bearer ${token}`;
+      }
+
       const apiResponse = await fetch(`${backendUrl}/chat`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
+        headers,
         body: JSON.stringify({ message: textToSend }),
       });
 
