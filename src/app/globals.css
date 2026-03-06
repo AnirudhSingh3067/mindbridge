@@ -73,7 +73,7 @@
   .cta-glow {
     @apply relative overflow-hidden;
     @apply after:absolute after:inset-0 after:bg-white/20 after:opacity-0 after:transition-opacity hover:after:opacity-100;
-    @apply shadow-[0_0_15px_hsl(var(--primary)/0.2)] hover:shadow-[0_0_25px_hsl(var(--primary)/0.4)];
+    @apply shadow-md hover:shadow-lg;
   }
 
   .shimmer {
