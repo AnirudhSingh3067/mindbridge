@@ -4,5 +4,8 @@ pydantic>=2.7.4
 firebase-admin>=6.5.0
 python-dotenv>=1.0.1
 openai>=1.34.0
-groq
-pydantic-settings
+groq>=0.9.0
+pydantic-settings 
+
+
+
