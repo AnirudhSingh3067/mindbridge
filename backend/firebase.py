@@ -1,4 +1,5 @@
 import os
+import json
 import firebase_admin
 from firebase_admin import credentials, auth
 from fastapi import Request, HTTPException, Security
@@ -8,9 +9,10 @@ from config import settings
 security = HTTPBearer()
 
 def initialize_firebase():
-    """Initializes Firebase Admin SDK with service account file."""
+    """Initializes Firebase Admin SDK using Render environment variable."""
     if not firebase_admin._apps:
-        cred = credentials.Certificate("serviceAccountKey.json")
+        firebase_config = json.loads(os.environ["FIREBASE_SERVICE_ACCOUNT"])
+        cred = credentials.Certificate(firebase_config)
         firebase_admin.initialize_app(cred)
 
 async def verify_firebase_token(credentials: HTTPAuthorizationCredentials = Security(security)):
