@@ -6,9 +6,6 @@ from config import settings
 import traceback
 
 router = APIRouter()
-client = AsyncGroq(
-    api_key=settings.GROQ_API_KEY,
-)
 
 class ChatRequest(BaseModel):
     message: str
@@ -16,8 +13,13 @@ class ChatRequest(BaseModel):
 class ChatResponse(BaseModel):
     reply: str
 
+# FIX 3: Added Depends(verify_firebase_token) so only valid frontend users can chat
 @router.post("/chat", response_model=ChatResponse)
-async def chat_endpoint(request: ChatRequest):
+async def chat_endpoint(request: ChatRequest, user: dict = Depends(verify_firebase_token)):
+    
+    # FIX 1 & 2: Initialize Groq INSIDE the endpoint to fix the Async Event Loop crash
+    client = AsyncGroq(api_key=settings.GROQ_API_KEY)
+    
     message = request.message
     
     if not message or not isinstance(message, str):
@@ -35,8 +37,6 @@ async def chat_endpoint(request: ChatRequest):
         )
 
     try:
-        print("GROQ KEY LOADED:", bool(settings.GROQ_API_KEY))
-
         response = await client.chat.completions.create(
             model="llama3-70b-8192",
             messages=[
