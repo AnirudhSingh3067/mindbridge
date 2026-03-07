@@ -37,7 +37,7 @@ async def chat_endpoint(request: ChatRequest):
 
     try:
         response = await client.chat.completions.create(
-            model="llama3-70b-8192",
+            model="llama-3.3-70b-versatile",
             messages=[
                 {"role": "system", "content": "You are a calm and supportive mental health assistant."},
                 {"role": "user", "content": message}
