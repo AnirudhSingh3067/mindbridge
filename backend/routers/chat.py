@@ -17,7 +17,7 @@ class ChatResponse(BaseModel):
 async def chat_endpoint(request: ChatRequest):
     
     # Initialize Groq INSIDE the endpoint to fix the Async connection crash
-    client = AsyncGroq(api_key=settings.GROQ_API_KEY)
+    client = AsyncGroq(api_key=settings.GROQ_API_KEY.strip())
     
     message = request.message
     
