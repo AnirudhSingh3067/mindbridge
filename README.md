@@ -198,15 +198,6 @@ http://localhost:9002
 
 ---
 
-## 📔 Journal
-
-* `POST /api/journal` – Create journal entry
-* `GET /api/journal` – Get journal entries
-* `PUT /api/journal/:id` – Update entry
-* `DELETE /api/journal/:id` – Delete entry
-
----
-
 ## 💬 Feedback
 
 * `POST /api/feedback` – Submit feedback
