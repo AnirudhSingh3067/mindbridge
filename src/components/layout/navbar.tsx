@@ -82,7 +82,7 @@ export function Navbar() {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-white/5 bg-black/95 backdrop-blur-md dark:border-white/5 dark:bg-black/95">
+    <header className="sticky top-0 z-50 w-full glass-panel border-b border-white/10 dark:border-white/10 transition-colors duration-300">
       <div className="container mx-auto flex h-18 items-center justify-between px-4 py-3">
         {/* Logo - Far Left */}
         <div className="flex items-center gap-2">
