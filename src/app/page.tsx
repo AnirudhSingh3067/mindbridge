@@ -15,6 +15,7 @@ import { MOCK_PSYCHOLOGISTS } from "@/lib/mock-data";
 import Image from "next/image";
 import { ScrollReveal, ScrollRevealItem } from "@/components/ui/scroll-reveal";
 import { MouseGlow } from "@/components/ui/mouse-glow";
+import { formatPrice } from "@/lib/utils";
 
 export default function Home() {
   return (
@@ -153,7 +154,7 @@ export default function Home() {
                     <p className="text-muted-foreground text-sm line-clamp-2 leading-relaxed font-light">"{p.bio}"</p>
                     <div className="pt-6 border-t border-border flex items-center justify-between">
                       <div className="flex flex-col">
-                        <span className="text-2xl font-bold text-foreground tracking-tight">${p.price}</span>
+                        <span className="text-2xl font-bold text-foreground tracking-tight">{formatPrice(p.price)}</span>
                         <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">Per Session</span>
                       </div>
                       <Button variant="secondary" size="sm" asChild className="rounded-xl px-5 btn-bounce">

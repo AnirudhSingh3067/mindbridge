@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { format } from "date-fns";
 import { useUser, useFirestore, useCollection, useMemoFirebase } from "@/firebase";
-import { collection, query, where, orderBy, Timestamp, doc, deleteDoc, writeBatch } from "firebase/firestore";
+import { collection, query, where, orderBy, Timestamp, doc, deleteDoc, writeBatch, increment } from "firebase/firestore";
 import { updateDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AnimatePresence, motion } from "framer-motion";
@@ -28,6 +28,7 @@ import {
   Trash2
 } from "lucide-react";
 import { MOCK_REVIEWS } from "@/lib/mock-data";
+import { formatPrice } from "@/lib/utils";
 
 interface Session {
   id: string;
@@ -36,6 +37,7 @@ interface Session {
   startTime: Timestamp | any;
   status: "upcoming" | "completed";
   meetingLink?: string | null;
+  isFree?: boolean;
   createdAt: any;
 }
 
@@ -58,7 +60,7 @@ export default function PsychologistDashboard() {
 
   const { data: sessionsData, isLoading } = useCollection<Session>(targetQuery);
 
-  const sessions = (sessionsData && Array.isArray(sessionsData)) ? sessionsData : [];
+  const sessions = (sessionsData && Array.isArray(sessionsData)) ? sessionsData.filter(s => s.status === "upcoming") : [];
 
   useEffect(() => {
     if (sessionsData && Array.isArray(sessionsData)) {
@@ -125,6 +127,37 @@ export default function PsychologistDashboard() {
     }
   };
 
+  const completeSelectedSessions = async () => {
+    if (selectedSessions.length === 0) return;
+    
+    // Only confirm safely
+    const confirmed = window.confirm(`Mark ${selectedSessions.length} session(s) as completed? This will deduct the user's free sessions.`);
+    if (!confirmed) return;
+
+    try {
+      const batch = writeBatch(db);
+      
+      const sessionsToComplete = selectedSessions.filter(sessionId => sessions.find(s => s.id === sessionId));
+
+      sessionsToComplete.forEach((sessionId) => {
+          const session = sessions.find(s => s.id === sessionId)!;
+          const sessionRef = doc(db, "sessions", sessionId);
+          batch.update(sessionRef, { status: "completed" });
+
+          // Only increment if we actively wanted to count it (all completed sessions count against the free tier)
+          const userRef = doc(db, "users", session.patientId);
+          batch.update(userRef, { usedSpecialistSessions: increment(1) });
+      });
+
+      await batch.commit();
+      toast({ title: "Success", description: "Sessions successfully marked as completed." });
+      setSelectedSessions([]);
+    } catch (err) {
+      console.error("Failed to complete sessions:", err);
+      toast({ title: "Error", description: "Could not mark sessions complete.", variant: "destructive" });
+    }
+  };
+
   const toggleSessionSelection = (sessionId: string, checked: boolean) => {
     if (checked) {
       setSelectedSessions(prev => [...prev, sessionId]);
@@ -161,7 +194,7 @@ export default function PsychologistDashboard() {
             <CardContent className="p-6 flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Monthly Earnings</p>
-                <h3 className="text-2xl font-bold">$4,820</h3>
+                <h3 className="text-2xl font-bold">{formatPrice(148200)}</h3>
               </div>
               <DollarSign className="h-8 w-8 text-emerald-500/40" />
             </CardContent>
@@ -208,12 +241,20 @@ export default function PsychologistDashboard() {
                     <div className="flex flex-row items-center justify-between pb-6 border-b border-gray-800 mb-4">
                       <h2 className="text-xl font-bold text-white">Scheduled Appointments</h2>
                       {selectedSessions.length > 0 && (
-                        <button
-                          onClick={deleteSelectedSessions}
-                          className="flex items-center bg-red-600 hover:bg-red-500 text-white text-sm px-4 py-2 rounded-lg transition-colors"
-                        >
-                          <Trash2 className="h-4 w-4 mr-2" /> Delete Selected ({selectedSessions.length})
-                        </button>
+                        <div className="flex items-center gap-3">
+                          <button
+                            onClick={completeSelectedSessions}
+                            className="flex items-center bg-emerald-600 hover:bg-emerald-500 text-white text-sm px-4 py-2 rounded-lg transition-colors"
+                          >
+                            <Settings className="h-4 w-4 mr-2" /> Mark Complete ({selectedSessions.length})
+                          </button>
+                          <button
+                            onClick={deleteSelectedSessions}
+                            className="flex items-center bg-red-600 hover:bg-red-500 text-white text-sm px-4 py-2 rounded-lg transition-colors"
+                          >
+                            <Trash2 className="h-4 w-4 mr-2" /> Delete Selected ({selectedSessions.length})
+                          </button>
+                        </div>
                       )}
                     </div>
 

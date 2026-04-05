@@ -40,6 +40,8 @@ export default function SignupPage() {
         name: name,
         email: user.email,
         role: role,
+        freeSpecialistSessions: 2,
+        usedSpecialistSessions: 0,
         createdAt: serverTimestamp(),
       });
 
@@ -53,6 +55,7 @@ export default function SignupPage() {
           experienceYears: 0,
           licenseNumber: "",
           pricePerSession: 0,
+          currency: "INR",
           availabilitySlots: []
         });
       }

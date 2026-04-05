@@ -5,6 +5,7 @@ export type Psychologist = {
   languages: string[];
   experience: number;
   price: number;
+  currency: string;
   rating: number;
   reviewsCount: number;
   license: string;
@@ -20,7 +21,8 @@ export const MOCK_PSYCHOLOGISTS: Psychologist[] = [
     specialization: ["Cognitive Behavioral Therapy", "Anxiety", "Depression"],
     languages: ["English", "Spanish"],
     experience: 12,
-    price: 120,
+    price: 1499,
+    currency: "INR",
     rating: 4.9,
     reviewsCount: 128,
     license: "PSY-99281-NY",
@@ -34,7 +36,8 @@ export const MOCK_PSYCHOLOGISTS: Psychologist[] = [
     specialization: ["Family Therapy", "Couples Counseling", "Trauma"],
     languages: ["English", "Mandarin"],
     experience: 8,
-    price: 95,
+    price: 999,
+    currency: "INR",
     rating: 4.7,
     reviewsCount: 84,
     license: "LMFT-88321-CA",
@@ -48,7 +51,8 @@ export const MOCK_PSYCHOLOGISTS: Psychologist[] = [
     specialization: ["Child Psychology", "ADHD", "Autism Spectrum"],
     languages: ["Spanish", "English", "Portuguese"],
     experience: 15,
-    price: 150,
+    price: 1999,
+    currency: "INR",
     rating: 5.0,
     reviewsCount: 210,
     license: "PSY-11029-TX",

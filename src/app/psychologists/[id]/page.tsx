@@ -29,9 +29,11 @@ import Image from "next/image";
 import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
 import { useUser, useFirestore } from "@/firebase";
-import { collection, serverTimestamp, Timestamp } from "firebase/firestore";
-import { addDocumentNonBlocking } from "@/firebase/non-blocking-updates";
+import { collection, serverTimestamp, Timestamp, doc } from "firebase/firestore";
 import Link from "next/link";
+import { formatPrice } from "@/lib/utils";
+import { useDoc } from "@/firebase";
+import { useMemo } from "react";
 
 const DEV_PRACTITIONER_UID = "Ci1YkKY538QVfn6X7OjS6wIIktm1";
 
@@ -44,6 +46,18 @@ export default function ProfilePage() {
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [meetingLink, setMeetingLink] = useState("");
   const [bookingState, setBookingState] = useState<"idle" | "loading" | "success">("idle");
+
+  const userDocRef = useMemo(() => {
+    if (!user?.uid) return null;
+    return doc(db, "users", user.uid);
+  }, [user?.uid, db]);
+
+  const { data: userData } = useDoc(userDocRef);
+
+  const freeSessions = userData?.freeSpecialistSessions ?? 0;
+  const usedSessions = userData?.usedSpecialistSessions ?? 0;
+  const hasFreeSessions = freeSessions > usedSessions;
+  const remainingFreeSessions = Math.max(0, freeSessions - usedSessions);
 
   const psychologist = MOCK_PSYCHOLOGISTS.find(p => p.id === id);
 
@@ -77,14 +91,21 @@ export default function ProfilePage() {
     sessionStart.setHours(hours, minutes, 0, 0);
 
     try {
-      addDocumentNonBlocking(collection(db, "sessions"), {
-        patientId: user.uid,
-        practitionerId: DEV_PRACTITIONER_UID,
-        startTime: Timestamp.fromDate(sessionStart),
-        status: "upcoming",
-        meetingLink: null,
-        createdAt: serverTimestamp(),
+      const response = await fetch('/api/book-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          patientId: user.uid,
+          practitionerId: DEV_PRACTITIONER_UID,
+          sessionStart: sessionStart.toISOString(),
+          isFree: hasFreeSessions
+        })
       });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to book session");
+      }
 
       // Dispatch event for PatientHistoryPanel to refresh
       if (typeof window !== "undefined") {
@@ -104,7 +125,7 @@ export default function ProfilePage() {
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to book your session. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to book your session. Please try again.",
         variant: "destructive",
       });
       setBookingState("idle");
@@ -211,11 +232,25 @@ export default function ProfilePage() {
           {/* Right Column: Booking Widget */}
           <div className="lg:col-span-1">
             <div className="sticky top-24 space-y-8">
-              <Card className="friendly-card ring-2 ring-primary/5 overflow-hidden">
-                <div className="bg-primary/5 border-b dark:border-slate-800 p-8 space-y-2">
+              <Card className="friendly-card ring-2 ring-primary/5 overflow-hidden relative">
+                {userData && (
+                  <div className="absolute top-0 right-0 bg-primary/10 text-primary text-[10px] font-bold px-3 py-1.5 rounded-bl-xl flex items-center gap-1.5 z-10">
+                    🎁 {hasFreeSessions ? `${remainingFreeSessions} Free Session${remainingFreeSessions !== 1 ? 's' : ''} Remaining` : 'No Free Sessions Left'}
+                  </div>
+                )}
+                <div className="bg-primary/5 border-b dark:border-slate-800 p-8 space-y-2 pt-10">
                   <div className="flex justify-between items-center">
                     <h3 className="text-xl font-headline font-bold">Session Cost</h3>
-                    <span className="text-3xl font-bold text-primary">${psychologist.price}</span>
+                    <span className="text-3xl font-bold text-primary">
+                      {hasFreeSessions ? (
+                        <span className="text-emerald-500 flex flex-col items-end">
+                          FREE
+                          <span className="line-through text-xs text-muted-foreground opacity-50 mt-1">{formatPrice(psychologist.price)}</span>
+                        </span>
+                      ) : (
+                        formatPrice(psychologist.price)
+                      )}
+                    </span>
                   </div>
                   <p className="text-xs text-primary/60 font-bold uppercase tracking-tighter">Per 50-minute clinical session</p>
                 </div>
@@ -306,7 +341,7 @@ export default function ProfilePage() {
                         </span>
                       ) : (
                         <span className="flex items-center gap-2">
-                          Book Session <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                          {hasFreeSessions ? "Book Free Session" : "Book Paid Session"} <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
                         </span>
                       )}
                     </Button>

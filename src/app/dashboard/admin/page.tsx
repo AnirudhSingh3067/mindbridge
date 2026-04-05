@@ -14,6 +14,7 @@ import {
   Loader2,
   Activity
 } from "lucide-react";
+import { formatPrice } from "@/lib/utils";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 
 const RISK_LEVELS = [
@@ -68,7 +69,7 @@ export default function AdminDashboard() {
             <CardContent className="p-6 flex items-center justify-between">
               <div>
                 <p className="text-xs text-muted-foreground uppercase tracking-widest font-bold mb-1">Revenue</p>
-                <h3 className="text-3xl font-bold text-emerald-500">$12,400</h3>
+                <h3 className="text-3xl font-bold text-emerald-500">{formatPrice(982400)}</h3>
               </div>
               <DollarSign className="h-10 w-10 text-emerald-500/20" />
             </CardContent>

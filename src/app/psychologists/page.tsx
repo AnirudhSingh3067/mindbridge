@@ -21,10 +21,10 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { useUser } from "@/firebase";
-import { cn } from "@/lib/utils";
+import { cn, formatPrice } from "@/lib/utils";
 
 const SPECIALIZATIONS = ["CBT", "Trauma", "Anxiety", "Depression", "ADHD", "Family Therapy", "Couples Counseling"];
-const PRICE_RANGES = ["Under $100", "$100 - $150", "$150+"];
+const PRICE_RANGES = ["Basic Plan (₹999)", "Standard Plan (₹1499)", "Premium Plan (₹1999+)"];
 
 export default function PsychologistsPage() {
   const [search, setSearch] = useState("");
@@ -224,7 +224,7 @@ export default function PsychologistsPage() {
                         <div className="pt-6 border-t mt-auto flex items-center justify-between">
                           <div className="flex flex-col">
                             <span className="text-2xl font-bold text-foreground flex items-center gap-1">
-                              <DollarSign className="h-5 w-5 text-primary" /> {p.price}
+                              {formatPrice(p.price)}
                             </span>
                             <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-tighter">per clinical hour</span>
                           </div>
