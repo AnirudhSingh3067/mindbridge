@@ -23,6 +23,7 @@ import {
   Settings,
   Video,
   Brain,
+  IndianRupee,
   TrendingUp,
   AlertCircle,
   Trash2
@@ -166,57 +167,110 @@ export default function PsychologistDashboard() {
     }
   };
 
+  const currentHour = new Date().getHours();
+  const greeting = currentHour < 12 ? "Good Morning" : currentHour < 18 ? "Good Afternoon" : "Good Evening";
+
   return (
     <div className="bg-background min-h-screen py-8">
       <div className="container mx-auto px-4 max-w-7xl">
-        <div className="flex justify-between items-end mb-8">
+        <div className="flex flex-col md:flex-row md:justify-between md:items-end mb-8 gap-4">
           <div>
-            <h1 className="text-3xl font-headline font-bold text-foreground">Practitioner Panel</h1>
-            <p className="text-muted-foreground">Welcome back, Dr. Manoj Sharma.</p>
+            <h1 className="text-3xl font-headline font-bold text-foreground mb-2">{greeting}, Dr. Manoj Sharma.</h1>
+            <p className="text-muted-foreground flex items-center gap-2 text-sm">
+               <span>You have {sessions.length} sessions today</span>
+               <span className="w-1 h-1 rounded-full bg-muted-foreground/50"></span>
+               <span>Next session soon</span>
+            </p>
           </div>
-          <Button variant="outline" className="gap-2 bg-card border-border">
+          <Button variant="outline" className="gap-2 bg-card border-border shadow-sm hover:shadow-md transition-shadow">
             <Settings className="h-4 w-4" /> Manage Availability
           </Button>
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-          <Card className="friendly-card border-none shadow-sm">
-            <CardContent className="p-6 flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Upcoming Today</p>
-                <h3 className="text-2xl font-bold">4</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <Card className="border border-border/50 bg-card/60 backdrop-blur-xl shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 overflow-hidden relative group">
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            <CardContent className="p-6 relative z-10 flex flex-col justify-between h-full">
+              <div className="flex items-start justify-between mb-4">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground mb-1">Upcoming Today</p>
+                  <h3 className="text-3xl font-bold font-headline">{sessions.length}</h3>
+                </div>
+                <div className="bg-primary/10 p-3 rounded-2xl group-hover:bg-primary/20 transition-colors duration-300">
+                  <Calendar className="h-6 w-6 text-primary" />
+                </div>
               </div>
-              <Calendar className="h-8 w-8 text-primary/40" />
+              <p className="text-xs font-medium text-emerald-500/80 mt-1 flex items-center">
+                Next session soon
+              </p>
             </CardContent>
           </Card>
-          <Card className="friendly-card border-none shadow-sm">
-            <CardContent className="p-6 flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Monthly Earnings</p>
-                <h3 className="text-2xl font-bold">{formatPrice(148200)}</h3>
+          
+          <Card className="border border-border/50 bg-card/60 backdrop-blur-xl shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 overflow-hidden relative group">
+            <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            <CardContent className="p-6 relative z-10 flex flex-col justify-between h-full">
+              <div className="flex items-start justify-between mb-4">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground mb-1">Monthly Earnings</p>
+                  <h3 className="text-3xl font-bold font-headline">{formatPrice(48200)}</h3>
+                </div>
+                <div className="bg-emerald-500/10 p-3 rounded-2xl group-hover:bg-emerald-500/20 transition-colors duration-300">
+                  <IndianRupee className="h-6 w-6 text-emerald-500" />
+                </div>
               </div>
-              <DollarSign className="h-8 w-8 text-emerald-500/40" />
+              <p className="text-xs font-medium text-emerald-500/80 mt-1 flex items-center">
+                +12% from last month
+              </p>
             </CardContent>
           </Card>
-          <Card className="friendly-card border-none shadow-sm">
-            <CardContent className="p-6 flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Patient Rating</p>
-                <h3 className="text-2xl font-bold">4.92</h3>
+
+          <Card className="border border-border/50 bg-card/60 backdrop-blur-xl shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 overflow-hidden relative group">
+            <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            <CardContent className="p-6 relative z-10 flex flex-col justify-between h-full">
+              <div className="flex items-start justify-between mb-4">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground mb-1">Patient Rating</p>
+                  <h3 className="text-3xl font-bold font-headline">4.92</h3>
+                </div>
+                <div className="bg-yellow-500/10 p-3 rounded-2xl group-hover:bg-yellow-500/20 transition-colors duration-300">
+                  <Star className="h-6 w-6 text-yellow-500" />
+                </div>
               </div>
-              <Star className="h-8 w-8 text-yellow-500/40" />
+              <p className="text-xs font-medium text-emerald-500/80 mt-1 flex items-center">
+                Top 10% this month
+              </p>
             </CardContent>
           </Card>
-          <Card className="friendly-card border-none shadow-sm">
-            <CardContent className="p-6 flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Active Patients</p>
-                <h3 className="text-2xl font-bold">28</h3>
+
+          <Card className="border border-border/50 bg-card/60 backdrop-blur-xl shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 overflow-hidden relative group">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            <CardContent className="p-6 relative z-10 flex flex-col justify-between h-full">
+              <div className="flex items-start justify-between mb-4">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground mb-1">Active Patients</p>
+                  <h3 className="text-3xl font-bold font-headline">28</h3>
+                </div>
+                <div className="bg-blue-500/10 p-3 rounded-2xl group-hover:bg-blue-500/20 transition-colors duration-300">
+                  <Users className="h-6 w-6 text-blue-500" />
+                </div>
               </div>
-              <Users className="h-8 w-8 text-blue-500/40" />
+              <p className="text-xs font-medium text-emerald-500/80 mt-1 flex items-center">
+                +5 this week
+              </p>
             </CardContent>
           </Card>
+        </div>
+
+        {/* Insight Section */}
+        <div className="bg-primary/5 border border-primary/10 rounded-2xl p-4 xl:p-5 mb-10 flex flex-col sm:flex-row items-start sm:items-center justify-between text-sm gap-4 shadow-sm">
+           <div className="flex items-center gap-3">
+              <div className="p-2 bg-primary/10 rounded-full shrink-0">
+                 <AlertCircle className="h-4 w-4 text-primary" />
+              </div>
+              <p className="text-muted-foreground leading-relaxed"><strong className="text-foreground">Insight:</strong> You're busier than usual today. Consider taking a short break between sessions.</p>
+           </div>
+           <Button variant="ghost" size="sm" className="text-primary hover:text-primary hover:bg-primary/10 shrink-0">Dismiss</Button>
         </div>
 
         <Tabs defaultValue="upcoming" className="space-y-6">

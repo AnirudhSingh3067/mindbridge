@@ -13,41 +13,8 @@ import {
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
-
-const RESOURCES = [
-  {
-    id: "r1",
-    title: "Understanding Anxiety: A Guide",
-    category: "Mental Health",
-    type: "Article",
-    image: "https://picsum.photos/seed/res1/400/250",
-    description: "Learn about the physiological roots of anxiety and daily coping strategies."
-  },
-  {
-    id: "r2",
-    title: "5-Minute Grounding Exercise",
-    category: "Coping",
-    type: "Exercise",
-    image: "https://picsum.photos/seed/res2/400/250",
-    description: "A quick audio-guided exercise to help you return to the present moment."
-  },
-  {
-    id: "r3",
-    title: "Better Sleep Hygiene",
-    category: "Wellness",
-    type: "Tips",
-    image: "https://picsum.photos/seed/res3/400/250",
-    description: "Proven techniques to improve your sleep quality and mental clarity."
-  },
-  {
-    id: "r4",
-    title: "Breathing for Stress Relief",
-    category: "Coping",
-    type: "Exercise",
-    image: "https://picsum.photos/seed/res4/400/250",
-    description: "Master the 4-7-8 technique for immediate relaxation."
-  }
-];
+import Link from "next/link";
+import { RESOURCES_DATA } from "@/lib/resources-data";
 
 export default function ResourcesPage() {
   return (
@@ -92,25 +59,29 @@ export default function ResourcesPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-           {RESOURCES.map(res => (
-             <Card key={res.id} className="friendly-card group overflow-hidden border-none shadow-sm">
-                <div className="relative h-48 w-full">
+           {RESOURCES_DATA.map(res => (
+             <Card key={res.id} className="friendly-card group overflow-hidden border-none shadow-sm flex flex-col">
+                <div className="relative h-48 w-full shrink-0">
                   <Image src={res.image} alt={res.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
                   <div className="absolute bottom-4 left-4">
                      <Badge className="bg-background/90 backdrop-blur text-foreground border-none px-3 py-1">{res.type}</Badge>
                   </div>
                 </div>
-                <CardContent className="p-8 space-y-4">
+                <CardContent className="p-8 space-y-4 flex-1 flex flex-col">
                    <div className="space-y-2">
                      <p className="text-[10px] font-bold text-primary uppercase tracking-widest">{res.category}</p>
                      <h4 className="text-xl font-bold leading-tight text-foreground group-hover:text-primary transition-colors">{res.title}</h4>
                    </div>
-                   <p className="text-sm text-muted-foreground leading-relaxed">
+                   <p className="text-sm text-muted-foreground leading-relaxed flex-1">
                      {res.description}
                    </p>
-                   <Button variant="ghost" className="p-0 h-auto font-bold group/btn text-foreground hover:bg-transparent hover:text-primary">
-                      Read More <ArrowRight className="ml-2 h-4 w-4 group-hover/btn:translate-x-1 transition-transform" />
-                   </Button>
+                   <div className="pt-4">
+                     <Link href={`/resources/${res.slug}`}>
+                       <Button variant="ghost" className="p-0 h-auto font-bold group/btn text-foreground hover:bg-transparent hover:text-primary">
+                          Read More <ArrowRight className="ml-2 h-4 w-4 group-hover/btn:translate-x-1 transition-transform" />
+                       </Button>
+                     </Link>
+                   </div>
                 </CardContent>
              </Card>
            ))}
